@@ -248,7 +248,11 @@ typedef enum osf_primitive_t {
    If you wish to get this down even further, the code path will need
    to be reduced. Equally, if you want to do stuff in between TX slots,
    then this value needs to be increased. */
+<<<<<<< HEAD
 #define OSF_TIFS_TICKS                (US_TO_RTIMERTICKSX(200))
+=======
+#define OSF_TIFS_TICKS                (US_TO_RTIMERTICKSX(2000))
+>>>>>>> dalhousie/bit-voting
 /* NB: REF_SHIFT: The TS takes it's reference time from TXEN, while the
    receivers sync on EVENTS_ADDRESS/FRAMESTART. The receivers therefore need
    to pull their ref time back by a processing offset between EVENTS_ADDRESS
@@ -488,6 +492,12 @@ extern uint8_t node_is_source;
 extern uint8_t node_is_destination;
 extern uint8_t node_is_br;
 
+<<<<<<< HEAD
+=======
+extern uint8_t was_out_of_sync;
+extern uint8_t exp_buf[OSF_CONF_DATA_LEN_MAX];
+
+>>>>>>> dalhousie/bit-voting
 /*---------------------------------------------------------------------------*/
 /* Callback for notifying other processes of received data */
 typedef void (*osf_input_callback_t)(uint8_t *data, uint8_t len);

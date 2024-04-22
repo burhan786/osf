@@ -4,7 +4,11 @@ endif
 
 ### Board selection
 BOARD ?= dk
+<<<<<<< HEAD
 BOARDS = dk 33dk dongle
+=======
+BOARDS = dk dongle
+>>>>>>> dalhousie/bit-voting
 
 ### Unless the example dictates otherwise, build with code size optimisations switched off
 SMALL ?= 0

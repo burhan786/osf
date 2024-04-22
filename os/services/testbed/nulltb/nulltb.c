@@ -66,7 +66,12 @@ config(void)
 static void
 init(void)
 {
+<<<<<<< HEAD
   tb_rand_init(node_id);
+=======
+  /* Use static num so all nodes have same buf */
+  tb_rand_init(1234);
+>>>>>>> dalhousie/bit-voting
 #if TB_CONF_PERIOD
   /* Setup a periodic send timer. */
   LOG_INFO("NULLTB PERIOD - %us\n", TB_PERIOD/CLOCK_SECOND);
@@ -88,11 +93,20 @@ event() {
 static void
 eeprom_read(uint8_t* dst_buf)
 {
+<<<<<<< HEAD
   uint8_t i;
   for(i = 0; i < tb_msg_len; i++)
   {
     TB_RAND_QUICK(dst_buf[i]);
   }
+=======
+  // maybe uncomment this
+  // uint8_t i;
+  // for(i = 0; i < tb_msg_len; i++)
+  // {
+  //   TB_RAND_QUICK(dst_buf[i]);
+  // }
+>>>>>>> dalhousie/bit-voting
   read_event = 0;
   rtimer_clock_t t_end_read = RTIMER_NOW() + TB_EEPROM_READ_TIME;
   do {} while(RTIMER_CLOCK_LT(RTIMER_NOW(), t_end_read));
@@ -132,7 +146,12 @@ PROCESS_THREAD(tb_nulltb_process, ev, data)
 {
   PROCESS_BEGIN();
 
+<<<<<<< HEAD
   if(tb_node_type != NODE_TYPE_SOURCE) {
+=======
+  // try to remove pkt_flag here
+  if(tb_node_type != NODE_TYPE_SOURCE && pkt_flag == 1) {
+>>>>>>> dalhousie/bit-voting
     LOG_WARN("Node type is (%s). Is not source, exiting nulltb reading process!\n", NODE_TYPE_TO_STR(tb_node_type));
     PROCESS_EXIT();
   }

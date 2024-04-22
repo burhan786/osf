@@ -57,6 +57,7 @@ init()
 }
 
 /*---------------------------------------------------------------------------*/
+<<<<<<< HEAD
 /* This will add between 0-OSF_NTX transmission slots to the statically 
    configured OSF_ROUND_<S/T/A>_NTX. See osf_round_configure() in 
    osf-proto-bcast.c and osf-proto-sta.c to see where it is added. E.g. if 
@@ -70,6 +71,17 @@ configure(osf_proto_t *proto)
   for (i = 0; i < proto->len; i++) {
     rconf = &proto->sched[i];
     rconf->ntx = rand;
+=======
+static void
+configure(osf_proto_t *proto)
+{
+  uint8_t i, rand_ntx;
+  OSF_RAND(rand_ntx, OSF_NTX);
+  osf_round_conf_t *rconf;
+  for (i = 0; i < proto->len; i++) {
+    slot = &proto->sched[i];
+    rconf->ntx = rand_ntx;
+>>>>>>> dalhousie/bit-voting
   }
 }
 
@@ -89,6 +101,7 @@ tx_ok()
 
 /*---------------------------------------------------------------------------*/
 static void
+<<<<<<< HEAD
 hop()
 {
 
@@ -96,6 +109,8 @@ hop()
 
 /*---------------------------------------------------------------------------*/
 static void
+=======
+>>>>>>> dalhousie/bit-voting
 rx_ok(uint8_t rnd_type, uint8_t *data, uint8_t data_len)
 {
 
@@ -124,9 +139,16 @@ osf_ext_d_t osf_ext_d_rntx = {
     &configure,
     &start,
     &tx_ok,
+<<<<<<< HEAD
     &hop,
+=======
+>>>>>>> dalhousie/bit-voting
     &rx_ok,
     &rx_error,
     &stop,
 };
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> dalhousie/bit-voting

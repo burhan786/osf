@@ -250,7 +250,11 @@ print_msg_log()
   osf_log_msg_t *l;
   while ((l = queue_dequeue(osf_log_msg_queue)) != NULL) {
       printf("[%-4s: %-10s] ", l->prefix, l->module);
+<<<<<<< HEAD
       printf("{%u|ep-%u|r-%u|s-%u} ", node_id, l->epoch, l->index, l->slot);
+=======
+      // printf("{%u|ep-%u|r-%u|s-%u} ", node_id, l->epoch, l->index, l->slot);
+>>>>>>> dalhousie/bit-voting
       switch(l->type) {
         case OSF_LOG_MSG_S:
           /* With %s no need for # of bytes (len) */
@@ -270,7 +274,12 @@ print_msg_log()
           break;
         case OSF_LOG_MSG_X:
           for(i = 0; i < l->len; i++) {
+<<<<<<< HEAD
             printf("%02x ", l->msg[i]);
+=======
+            // printf("%02x ", l->msg[i]);
+            printf("%u ", l->msg[i]);
+>>>>>>> dalhousie/bit-voting
           };
           printf("\n");
           break;
@@ -299,7 +308,11 @@ print_slots_state()
 {
 #if OSF_LOG_SLOTS_STATE
   uint8_t i, j;
+<<<<<<< HEAD
   LOG_INFO("{%u|ep-%-4u} ", node_id, osf.epoch);
+=======
+  // LOG_INFO("{%u|ep-%-4u} ", node_id, osf.epoch);
+>>>>>>> dalhousie/bit-voting
   for (i = 0; i < osf.proto->len; i++) {
     for(j = 0; j < osf.proto->sched[i].max_slots; j++) {
 #if OSF_LOG_SLOTS_NODE | OSF_LOG_SLOTS_CH
@@ -310,7 +323,11 @@ print_slots_state()
       LOG_INFO_("%c", slots[i].state[j]);
 #endif
     }
+<<<<<<< HEAD
     LOG_INFO_("|");
+=======
+    // LOG_INFO_("|");
+>>>>>>> dalhousie/bit-voting
   }
   LOG_INFO_("\n");
 #endif

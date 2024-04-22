@@ -73,7 +73,11 @@
 #define OSF_LOG_HEARTBEAT             0
 #endif /* OSF_LOGGING */
 
+<<<<<<< HEAD
 #define OSF_LOG_PRINT_LEN_MAX         8
+=======
+#define OSF_LOG_PRINT_LEN_MAX         20
+>>>>>>> dalhousie/bit-voting
 
 /*---------------------------------------------------------------------------*/
 /* Msg logs */
@@ -101,7 +105,11 @@ typedef struct radio_buffer {
 //       messages until you want to print them. It would also be useful for
 //       the TSCH logging system
 #define OSF_LOG_MSG_SIZE_MAX          100
+<<<<<<< HEAD
 #define OSF_LOG_MSG_LEN_MAX           64
+=======
+#define OSF_LOG_MSG_LEN_MAX           255
+>>>>>>> dalhousie/bit-voting
 
 /* Poor man's approach to %s %u %d %x */
 typedef struct osf_log_msg {

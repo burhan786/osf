@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+#!/bin/bash
+>>>>>>> dalhousie/bit-voting
 # ----------------------------------------------------------------------------#
 # *** dcube.sh README ***
 # Filename:     dcube.sh
@@ -101,7 +105,11 @@ function compile {
   echo "Compiling..."
   echo " > EXAMPLE: $PWD"
   echo " > TARGET: $TARGET"
+<<<<<<< HEAD
   # echo " > MAKEARGS: $@"
+=======
+  echo " > MAKEARGS: $@"
+>>>>>>> dalhousie/bit-voting
   echo " > CMD: make clean TARGET=$TARGET && make -j16 TARGET=$TARGET BOARD=dk DEPLOYMENT=dcube $@"
 
 
@@ -199,8 +207,13 @@ while (( "$#" )); do
       shift
       ;;
     -m)
+<<<<<<< HEAD
       METRIC=$2
       shift 2
+=======
+      # METRIC=$2
+      shift 
+>>>>>>> dalhousie/bit-voting
       ;;
     --range=*)
       RANGE=${1:8}

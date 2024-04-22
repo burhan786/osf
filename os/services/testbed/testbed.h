@@ -195,11 +195,24 @@ struct testbed_driver {
   uint8_t (* pop)(uint8_t **dest, uint8_t *len);		/* Write to the testbed */
   void (* poll_read)(void);													/* Poll the eeprom reader process */
   void (* poll_write)(void);												/* Poll the eeprom writer process */
+<<<<<<< HEAD
+=======
+  void (*poll_pkt_flag)(void);                      /* Poll to update pkt flag for DST */
+>>>>>>> dalhousie/bit-voting
 	tb_read_callback read_callback;										/* Called on successful e2 read */
 };
 extern struct testbed_driver testbed;
 
 /*---------------------------------------------------------------------------*/
+<<<<<<< HEAD
+=======
+extern uint8_t pkt_flag;
+extern uint8_t tb_rx_fifo[TB_RX_FIFO_LEN][MAX_TB_PACKET_LEN];
+extern uint8_t tb_rx_fifo_pos;
+extern uint16_t  tb_exp_id;
+
+/*---------------------------------------------------------------------------*/
+>>>>>>> dalhousie/bit-voting
 volatile tb_pattern_t  *tb_get_pattern();
 volatile tb_config_t   *tb_get_config();
 uint8_t                 tb_get_n_src();

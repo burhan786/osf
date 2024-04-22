@@ -60,6 +60,10 @@ node_id_init(void) {
 
 #if BUILD_WITH_TESTBED && TB_PATCHING && BUILD_WITH_DEPLOYMENT
   /* Configure through patching. Failing that, configure through deployment */
+<<<<<<< HEAD
+=======
+  deployment_init();
+>>>>>>> dalhousie/bit-voting
   LOG_DBG("Init ID through patching.\n");
   node_id = dc_cfg.node_id;
   if(!node_id) {
@@ -74,8 +78,17 @@ node_id_init(void) {
 
 #elif BUILD_WITH_DEPLOYMENT
   /* Configure through deployment struct */
+<<<<<<< HEAD
   LOG_DBG("Init ID through deployment.\n");
   deployment_init();
+=======
+  LOG_DBG("Init ID through deployment: ");
+  deployment_init();
+  LOG_DBG_("%u\n", node_id);
+  if(!node_id) {
+    LOG_WARN("Could not find node id!\n");
+  } 
+>>>>>>> dalhousie/bit-voting
 
 #else
 

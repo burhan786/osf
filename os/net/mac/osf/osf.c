@@ -48,6 +48,10 @@
 
 #if BUILD_WITH_TESTBED
 #include "services/testbed/testbed.h"
+<<<<<<< HEAD
+=======
+#include "services/testbed/testbed-rand.h"
+>>>>>>> dalhousie/bit-voting
 #endif
 
 #include "nrf_timer.h"
@@ -76,6 +80,10 @@ static void RADIO_IRQHandler_callback();
 #include "services/deployment/deployment.h"
 #if CONF_TESTBED
 #include "services/testbed/testbed.h"
+<<<<<<< HEAD
+=======
+#include "services/testbed/testbed-rand.h"
+>>>>>>> dalhousie/bit-voting
 #endif
 
 /* Log configuration */
@@ -114,6 +122,19 @@ uint8_t node_is_source = 0;
 uint8_t node_is_destination = 0;
 uint8_t node_is_br = 0;
 
+<<<<<<< HEAD
+=======
+uint8_t was_out_of_sync = 0;
+// uint8_t exp_buf[TB_CONF_NULLTB_DATA_LEN] = {0};
+static uint8_t exp_pkt_buf[255] = {0};
+static uint8_t err_arr[2040] = {0};
+static uint8_t err_flag = 0;
+static uint32_t packet_len_bits;
+static uint8_t packet_len;
+uint8_t exp_buf[OSF_CONF_DATA_LEN_MAX] = {0};
+uint8_t pkt_number = 0;
+uint16_t prev_seed = 0;
+>>>>>>> dalhousie/bit-voting
 /* Timings */
 rtimer_clock_t t_ref = 0;          // ref time for start of each slot
 static rtimer_clock_t t_ev_ready_ts = 0;  // end event timestamp
@@ -149,6 +170,13 @@ static void    end_round();
 static inline void do_slot();
 static void    print_osf_config();
 static void    print_osf_timings();
+<<<<<<< HEAD
+=======
+static void create_expected_packet();
+static void isolate_errors();
+static void update_pkt_payload();
+static void resync(uint16_t, uint16_t);
+>>>>>>> dalhousie/bit-voting
 
 /* Check if in interrupt mode */
 static inline bool isInterrupt()
@@ -156,6 +184,13 @@ static inline bool isInterrupt()
   return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }
 
+<<<<<<< HEAD
+=======
+/* Callback for implement customized led indication in application */
+osf_led_on_t osf_led_on =  NULL;
+osf_led_off_t osf_led_off = NULL;
+
+>>>>>>> dalhousie/bit-voting
 /*---------------------------------------------------------------------------*/
 /* Processes */
 /*---------------------------------------------------------------------------*/
@@ -163,7 +198,10 @@ static inline bool isInterrupt()
 //        Although I think we do something similar for the TESTBED calls?
 PROCESS(osf_post_round_process, "OSF Post Round Process");
 PROCESS(osf_post_epoch_process, "OSF Post Epoch Process");
+<<<<<<< HEAD
 
+=======
+>>>>>>> dalhousie/bit-voting
 /*---------------------------------------------------------------------------*/
 // TODO: Replace with osf_off()
 static void
@@ -178,8 +216,44 @@ osf_stop(void)
   NETSTACK_PA.off();
   /* Do extensions */
   DO_OSF_D_EXTENSION(stop);
+<<<<<<< HEAD
 
   DEBUG_LEDS_OFF(CRCERR_LED);
+=======
+  
+  /* To spoof the logging that happens at the end of the round when bit voting is enabled*/
+  if ((osf_d_extension == NULL) && (tb_node_type == NODE_TYPE_DESTINATION)){
+    if (was_out_of_sync == 1 && pkt_flag == 1) {
+          osf_pkt_s_round_t *rnd_pkt = (osf_pkt_s_round_t *)osf_buf_rnd_pkt;
+          uint16_t tmp = (osf.epoch-1) % 3;
+          tmp = (osf.epoch-1) - tmp;
+          resync(rnd_pkt->id, tmp);
+          
+          // tb_exp_id = bv_pkt->id;
+          was_out_of_sync = 0;
+        }
+    
+    uint32_t packet_len_bits = osf_buf_len*8;
+    PRINT("EP:%d,N_RX:%d,N_ERR_PKTS:%d,"
+          "ERRS:{",
+          osf.epoch, osf.n_rx_ok + osf.n_rx_crc, osf.n_rx_crc
+          );
+    if (err_flag == 1){
+      uint32_t i;
+      for(i = 0; i < packet_len_bits; i++) {
+        if(err_arr[i] != 0) {
+          PRINT("%ld:%d;", i, err_arr[i]);
+        }
+      }
+    }
+    PRINT("},SLTS:");
+    // clear errors for next round
+    memset(&err_arr, 0, sizeof(err_arr));
+    err_flag = 0;
+  }
+
+  DEBUG_LEDS_OFF(ROUND_LED);
+>>>>>>> dalhousie/bit-voting
 }
 
 /*---------------------------------------------------------------------------*/
@@ -197,6 +271,10 @@ osf_sync(void)
   /* Calculate drift if already synced */
   if(node_is_synced) {
     osf.t_epoch_drift = t_epoch_ref_tmp - osf.t_epoch_ref;
+<<<<<<< HEAD
+=======
+    was_out_of_sync = 0;
+>>>>>>> dalhousie/bit-voting
   }
   /* Sync */
   osf_pkt_s_round_t *rnd_pkt = (osf_pkt_s_round_t *)osf_buf_rnd_pkt;
@@ -270,11 +348,59 @@ set_timesync()
 /* Round scheduling */
 /*---------------------------------------------------------------------------*/
 static void
+<<<<<<< HEAD
+=======
+update_id(uint16_t ep) {
+  if(ep % 3 == 0) {
+    // set id
+    if(pkt_flag == 1) {
+      tb_exp_id++;
+    }
+    if (tb_exp_id == 0 && pkt_flag == 1) {
+      tb_exp_id = 1;
+    }
+  }
+}
+
+static void
+update_msg(uint16_t seed, uint8_t *dt_buf)
+{
+  // set seed relative to epoch
+  if(tb_node_type == NODE_TYPE_SOURCE) {
+    tb_rand_init(seed);
+  }
+  else if (tb_node_type == NODE_TYPE_DESTINATION) {
+    tb_rand_init(seed-1);
+  }
+
+  // update buffer
+  uint8_t i;
+  for(i = 0; i < tb_msg_len; i++)
+  {
+    TB_RAND(dt_buf[i], TB_RAND_BUF_MAX);
+  }
+
+  if(tb_node_type == NODE_TYPE_SOURCE) {
+    update_id(osf.epoch);
+    if(prev_seed != seed){
+      prev_seed = seed;
+    }
+  }
+  else {
+    update_id(osf.epoch-1);
+  }
+}
+
+static void
+>>>>>>> dalhousie/bit-voting
 schedule_epoch()
 {
   /* Increment the epoch counter */
   osf.epoch++;
+<<<<<<< HEAD
   // DEBUG_LEDS_TOGGLE(ROUND_LED);
+=======
+>>>>>>> dalhousie/bit-voting
   /* Set next available epoch from now */
   osf.t_epoch_ref += osf.period;
   /* Check that we haven't overrun doing other stuff. If so, keep calling this
@@ -285,8 +411,24 @@ schedule_epoch()
   } else {
 #if BUILD_WITH_TESTBED
     if (tb_node_type == NODE_TYPE_SOURCE && node_is_synced) {
+<<<<<<< HEAD
       testbed.poll_read();
     }
+=======
+      /* Update packet payload */
+      uint16_t src_seed = osf.epoch % 3;
+      src_seed = osf.epoch - src_seed;
+      update_msg(src_seed, tb_rx_fifo[tb_rx_fifo_pos++]);
+      testbed.poll_read();
+    }
+    else if (tb_node_type == NODE_TYPE_DESTINATION && node_is_synced) {
+      /* Update packet payload */
+      uint16_t dst_seed = (osf.epoch - 1) % 3;
+      dst_seed = osf.epoch - dst_seed;
+      update_msg(dst_seed, exp_buf);
+      testbed.poll_pkt_flag();
+    }
+>>>>>>> dalhousie/bit-voting
 #endif
     /* Clear protocol schedule */
     uint8_t i;
@@ -328,6 +470,10 @@ schedule_ch_timeout(rtimer_clock_t now)
     /* Print so we know we are still alive */
     if(n_ch_timeouts && !(n_ch_timeouts % 20)) {
       LOG_INFO("{%u|syn-%-4u} <3\n", node_id, n_ch_timeouts);
+<<<<<<< HEAD
+=======
+      was_out_of_sync = 1;
+>>>>>>> dalhousie/bit-voting
     }
   /* If we are synced, we want to try and hop with the initiator(s) */
   } else {
@@ -358,6 +504,10 @@ schedule_ch_timeout(rtimer_clock_t now)
       }
     } else {
       /* We never received, so return to the round process */
+<<<<<<< HEAD
+=======
+      // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
       osf_stop();
       end_round();
       return 0;
@@ -384,6 +534,10 @@ schedule_rx_timeout(rtimer_clock_t now)
   if (r != RTIMER_OK) {
     osf_stop();
     LOG_WARN("RX timeout MISS\n");
+<<<<<<< HEAD
+=======
+    // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
     end_round();
     osf_stat.osf_rt_miss_timeout_total++;/* Statistics */
     return 0;
@@ -411,6 +565,10 @@ schedule_slot_timeout(rtimer_clock_t now)
   if (r != RTIMER_OK) {
     osf_stop();
     LOG_WARN("GLOSSY timeout MISS\n");
+<<<<<<< HEAD
+=======
+    // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
     end_round();
     osf_stat.osf_rt_miss_glossy_total++;/* Statistics */
     return 0;
@@ -548,6 +706,11 @@ end_rx()
 
   /* Check CRC */
   if(osf.last_rx_ok) {
+<<<<<<< HEAD
+=======
+    /* Error indicator */
+    DEBUG_LEDS_OFF(CRCERR_LED);
+>>>>>>> dalhousie/bit-voting
     /* We received a valid packet */
     osf_state = OSF_STATE_RECEIVED;
     osf.n_rx_ok += 1;
@@ -569,16 +732,43 @@ end_rx()
     }
     /* Do extensions */
     DO_OSF_D_EXTENSION(rx_ok, osf.round->type, osf_buf, osf_buf_len);
+<<<<<<< HEAD
+=======
+
+    if ((osf_d_extension == NULL) && (tb_node_type == NODE_TYPE_DESTINATION)){
+        osf_pkt_hdr_t *exp_hdr = (osf_pkt_hdr_t *)&exp_pkt_buf[0];
+        osf_pkt_s_round_t *rnd_pkt = (osf_pkt_s_round_t *)osf_buf_rnd_pkt;
+        exp_hdr->slot = osf.slot;
+
+        if (was_out_of_sync == 1 && pkt_flag == 1) {
+          // PRINT("resync\n");
+          uint16_t tmp = (osf.epoch-1) % 3;
+          tmp = (osf.epoch-1) - tmp;
+          resync(rnd_pkt->id, tmp);
+
+          // tb_exp_id = rnd_pkt->id;
+          was_out_of_sync = 0;
+    }
+          //     osf_log_x("Packet Calclatd in rx_ok", exp_pkt_buf, osf_buf_len);
+          // osf_log_x("Packet Received in rx_ok", osf_buf, osf_buf_len);
+    }
+>>>>>>> dalhousie/bit-voting
 #if OSF_LOGGING
     osf_log_slot_state('R');
     osf_log_slot_node(osf_buf_hdr->src);
     osf_log_slot_rssi();
     osf_log_slot_td();
+<<<<<<< HEAD
     osf_log_radio_buffer(osf_buf, OSF_PKT_PHY_LEN(osf.rconf->phy->mode, osf.round->statlen) + osf_buf_len, 0, OSF_PKT_RND_LEN(osf.round->type), osf.round->statlen, osf.round->type);
 #endif
   } else {
     /* Error indicator */
     DEBUG_LEDS_ON(CRCERR_LED);
+=======
+    // osf_log_radio_buffer(osf_buf, OSF_PKT_PHY_LEN(osf.rconf->phy->mode, osf.round->statlen) + osf_buf_len, 0, OSF_PKT_RND_LEN(osf.round->type), osf.round->statlen, osf.round->type);
+#endif
+  } else {
+>>>>>>> dalhousie/bit-voting
     /* We received an invalid packet. Log this error then head back to RX */
     osf.n_rx_crc += 1;
     // FIXME: This should not be done here.
@@ -591,6 +781,19 @@ end_rx()
     }
     /* Do extensions */
     DO_OSF_D_EXTENSION(rx_error);
+<<<<<<< HEAD
+=======
+    
+    if ((osf_d_extension == NULL) && (tb_node_type == NODE_TYPE_DESTINATION)){
+        osf_pkt_hdr_t *exp_hdr = (osf_pkt_hdr_t *)&exp_pkt_buf[0];
+        exp_hdr->slot = osf.slot;
+        if (was_out_of_sync == 0) {
+          isolate_errors();
+          err_flag = 1;
+        }
+    }
+
+>>>>>>> dalhousie/bit-voting
 #if OSF_LOGGING
     osf_log_slot_state('C');
     osf_log_slot_rssi();
@@ -653,7 +856,11 @@ end_tx()
     n_ch_timeouts++;
   // }
   /* Do next slot */
+<<<<<<< HEAD
   osf_log_radio_buffer(osf_buf, OSF_PKT_PHY_LEN(osf.rconf->phy->mode, osf.round->statlen) + osf_buf_len, 1, OSF_PKT_RND_LEN(osf.round->type), osf.round->statlen, osf.round->type);
+=======
+  // osf_log_radio_buffer(osf_buf, OSF_PKT_PHY_LEN(osf.rconf->phy->mode, osf.round->statlen) + osf_buf_len, 1, OSF_PKT_RND_LEN(osf.round->type), osf.round->statlen, osf.round->type);
+>>>>>>> dalhousie/bit-voting
   osf.slot++; // increment to next slot (also do this in RX)
   do_slot();
 }
@@ -671,7 +878,10 @@ do_slot()
   }
   /* Loop for NTX timeslots in round (TX and RX) */
   if(ROUND_LEN_RULE) {
+<<<<<<< HEAD
     DEBUG_LEDS_ON(ROUND_LED);
+=======
+>>>>>>> dalhousie/bit-voting
     /* Do we TX or RX this timeslot? */
     if(osf.round->primitive == OSF_PRIMITIVE_ROF ? OSF_DOTX_ROF() : OSF_DOTX_GLOSSY()) {
       r = start_tx(t_ref);
@@ -691,6 +901,10 @@ do_slot()
           node_id, osf.epoch, OSF_ROUND_TO_STR(osf.round->type),
           RTIMERTICKS_TO_USX(now - t_ref), RTIMERTICKS_TO_USX(now - t_epoch_end));
         osf.proto->index = osf.proto->len; // we exit the round process after we reach len
+<<<<<<< HEAD
+=======
+        // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
         osf_stop();
         end_round();
         osf_stat.osf_rt_miss_epoch_total++; /* Statictics */
@@ -702,6 +916,10 @@ do_slot()
         LOG_DBG("{%u|ep-%-4u} rt miss ROUND %s | t_ref:+%lu us eor:+%lu us\n",
           node_id, osf.epoch, OSF_ROUND_TO_STR(osf.round->type),
           RTIMERTICKS_TO_USX(now - t_ref), RTIMERTICKS_TO_USX(now - t_round_end));
+<<<<<<< HEAD
+=======
+        // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
         osf_stop();
         end_round();
         osf_stat.osf_rt_miss_round_total++;/* Statictics */
@@ -717,9 +935,15 @@ do_slot()
       }
     }
   } else {
+<<<<<<< HEAD
     osf_stop();
     end_round();
     DEBUG_LEDS_OFF(ROUND_LED);
+=======
+    // LOG_INFO("ROUND END\n");
+    osf_stop();
+    end_round();
+>>>>>>> dalhousie/bit-voting
   }
 }
 
@@ -727,6 +951,14 @@ do_slot()
 /*---------------------------------------------------------------------------*/
 static void
 start_round() {
+<<<<<<< HEAD
+=======
+  // LOG_INFO("ROUND START\n");
+
+  /* Round indicator */
+  DEBUG_LEDS_ON(ROUND_LED);
+
+>>>>>>> dalhousie/bit-voting
   /* Register our own radio handler (we can release later) */
   // FIXME: Radio stuff needs to be moved to the radio driver.
   NVIC_DisableIRQ(RADIO_IRQn);
@@ -740,6 +972,15 @@ start_round() {
   /* Initialise the round */
   osf.round = osf.rconf->round;
 
+<<<<<<< HEAD
+=======
+  // FIXME: This is stupid. If you want to do this then have the LED on the epoch.
+  /* Live round indicator. S round always. */
+  if(osf.round->type == OSF_ROUND_S) {
+    DEBUG_LEDS_ON(ROUND_LED);
+  }
+
+>>>>>>> dalhousie/bit-voting
   /* Init radio event times */
   t_ev_ready_ts = 0;
   t_ev_addr_ts = 0;
@@ -780,6 +1021,15 @@ start_round() {
   /* Do extension */
   // DEBUG_GPIO_ON(DBG_PIN2);
   DO_OSF_D_EXTENSION(start, osf.round->type, osf.round->is_initiator, OSF_PKT_RND_LEN(osf.round->type));
+<<<<<<< HEAD
+=======
+    // Create packet to use for error isolation
+  if((osf_d_extension == NULL) && (tb_node_type == NODE_TYPE_DESTINATION)) {
+    memset(&exp_pkt_buf, 0, sizeof(exp_pkt_buf));
+    create_expected_packet();
+    // osf_log_x("Packet Calclatd in start", exp_pkt_buf, osf_buf_len);
+  }
+>>>>>>> dalhousie/bit-voting
   // DEBUG_GPIO_OFF(DBG_PIN2);
 
   /* Check we aren't trying to send more than the MTU can handle */
@@ -796,10 +1046,22 @@ start_round() {
       osf_ch_init_scan_index();
     }
 
+<<<<<<< HEAD
+=======
+    /* Live round indicator. More rounds with payload increase LED on time. */
+    if(len) {
+      DEBUG_LEDS_ON(ROUND_LED);
+    }
+
+>>>>>>> dalhousie/bit-voting
     /* Start the slots */
     do_slot();
   } else {
     LOG_ERR("osf_buf_len (%u) > OSF_MAXLEN (%u)!\n", osf_buf_len, OSF_MAXLEN(osf.rconf->phy->mode));
+<<<<<<< HEAD
+=======
+    // LOG_INFO("ROUND END\n");
+>>>>>>> dalhousie/bit-voting
     end_round();
   }
 }
@@ -822,14 +1084,21 @@ end_round() {
 
   /* Clear the buffer */
   memset(osf_buf, 0, sizeof(osf_buf_t));
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> dalhousie/bit-voting
   /* Free the handler for other MACs */
   // FIXME: Radio stuff should really not go here
   NVIC_DisableIRQ(RADIO_IRQn);
   nrf_radio_int_disable(0xFFFFFFFF);
   NVIC_ClearPendingIRQ(RADIO_IRQn);
   nrf52840_radioirq_register_handler(NULL);
+<<<<<<< HEAD
 
+=======
+>>>>>>> dalhousie/bit-voting
   /* Next round */
   osf.proto->index++;
   if ((osf.rconf = osf.proto->next_round()) != NULL) {
@@ -1197,3 +1466,71 @@ print_osf_timings()
   LOG_INFO("- OSF_RX_GUARD                 - %llu (%luus)\n", OSF_RX_GUARD, RTIMERTICKS_TO_USX(OSF_RX_GUARD));
   LOG_INFO("- OSF_REF_SHIFT                - %lu ticks | %lu us\n", OSF_REF_SHIFT, RTIMERTICKS_TO_USX(OSF_REF_SHIFT));
 }
+<<<<<<< HEAD
+=======
+
+/*---------------------------------------------------------------------------*/
+static void
+create_expected_packet()
+{
+  packet_len = osf_buf_len;
+  
+  osf_pkt_hdr_t *exp_hdr = (osf_pkt_hdr_t *)&exp_pkt_buf[0];
+  osf_pkt_s_round_t *exp_pkt = (osf_pkt_s_round_t *)&exp_pkt_buf[OSF_PKT_HDR_LEN];
+  exp_hdr->src = osf.sources[0];        // known source
+  if (!pkt_flag) {
+    exp_hdr->dst = 0xff;                // known dst
+    exp_pkt->id = 0;
+  }
+  else {
+    exp_hdr->dst = node_id; // known dst
+    update_pkt_payload(&exp_pkt->payload[0]);
+    exp_pkt->id = tb_exp_id;
+  }
+  // exp_hdr->slot = 0;                    // 0 slot for bv_crc
+  // exp_pkt->epoch = 0;                   // 0 epoch for bv_crc
+
+  // // Find & add bv_crc
+  // exp_bv_crc = crc16_ccitt(&exp_pkt_buf[0], packet_len - sizeof(exp_bv_crc), 0xFFFF);
+  // memcpy(exp_pkt->bv_crc, &exp_bv_crc, sizeof(exp_bv_crc));
+
+  exp_hdr->slot = osf.slot;             // current slot
+  exp_pkt->epoch = osf.epoch;           // current epoch
+}
+
+/*---------------------------------------------------------------------------*/
+static void
+update_pkt_payload(uint8_t *dst_buf){
+  uint8_t i;
+  for(i = 0; i < tb_msg_len; i++) {
+    dst_buf[i] = exp_buf[i];
+  }
+}
+
+/*---------------------------------------------------------------------------*/
+static void
+resync(uint16_t id, uint16_t seed) {
+  tb_exp_id = id;
+  tb_rand_init(seed);
+
+  // update buffer
+  uint8_t i;
+  for(i = 0; i < tb_msg_len; i++)
+  {
+    TB_RAND(exp_buf[i], TB_RAND_BUF_MAX);
+  }
+}
+
+/*---------------------------------------------------------------------------*/
+static void
+isolate_errors()
+{
+  packet_len_bits = osf_buf_len * 8;
+  uint32_t i;
+  for (i = 8; i < packet_len_bits; i++) {
+    if(OSF_CHK_BIT_BYTE(exp_pkt_buf, i) ^ OSF_CHK_BIT_BYTE(osf_buf, i)) {
+      err_arr[i]++;
+    }
+  }
+}
+>>>>>>> dalhousie/bit-voting

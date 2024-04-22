@@ -88,7 +88,11 @@
 #endif /* PWR */
 
 /*---------------------------------------------------------------------------*/
+<<<<<<< HEAD
 /* D-Cube experimental testing options */
+=======
+/* OSF protocol options */
+>>>>>>> dalhousie/bit-voting
 /*---------------------------------------------------------------------------*/
 /* Max # of slots in a flood */
 #ifdef NSLOTS
@@ -135,21 +139,50 @@
 #define OSF_CONF_ROUND_A_ALWAYS_ACK         ALWAYS_ACK
 #endif
 
+<<<<<<< HEAD
+=======
+/*---------------------------------------------------------------------------*/
+/* OSF protocol extensions */
+/*---------------------------------------------------------------------------*/
+>>>>>>> dalhousie/bit-voting
 /* Noise Detection protocol extension */
 #ifdef ND
 #define OSF_CONF_EXT_ND                     ND
 #endif
 
+<<<<<<< HEAD
 /* Random NTX */
+=======
+/* Random TX Backoff protocol extension */
+#ifdef BACKOFF
+#define OSF_CONF_EXT_BACKOFF                BACKOFF
+#endif
+
+/*---------------------------------------------------------------------------*/
+/* OSF driver extensions */
+/*---------------------------------------------------------------------------*/
+/* Random NTX driver extension */
+>>>>>>> dalhousie/bit-voting
 #ifdef RNTX
 #define OSF_CONF_EXT_RNTX                   RNTX
 #endif
 
+<<<<<<< HEAD
 /* Random TX Backoff */
 #ifdef BACKOFF
 #define OSF_CONF_EXT_BACKOFF                BACKOFF
 #endif
 
+=======
+/* Bit-Voting driver extension */
+#ifdef BV
+#define OSF_CONF_EXT_BV                     BV
+#endif
+
+/*---------------------------------------------------------------------------*/
+/* Testing */
+/*---------------------------------------------------------------------------*/
+>>>>>>> dalhousie/bit-voting
 /* Miss RXES testing */
 #ifdef MISS_RXS
 #define OSF_CONF_TEST_MISS_RXS              MISS_RXS

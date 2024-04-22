@@ -7,7 +7,11 @@ $act = "queue/create_job";
 
 $job = array(
     "protocol"        => intval($argv[2]),
+<<<<<<< HEAD
     "layout"          => $argv[3],
+=======
+    "layout"          => $argv[3], 
+>>>>>>> dalhousie/bit-voting
     "periodicity"     => intval($argv[4]),
     "message_length"  => intval($argv[5]),
     "patching"        => intval($argv[6]),
@@ -36,7 +40,10 @@ if(sizeof($overrides)) {
 
 $payload = json_encode($job);
 
+<<<<<<< HEAD
 print_r($payload);
+=======
+>>>>>>> dalhousie/bit-voting
 $options = array(
     'http' => array(
     'method'  => 'POST',
@@ -49,7 +56,10 @@ $context  = stream_context_create($options);
 $result = file_get_contents($base . $act . $key, false, $context);
 $response = json_decode($result, true);
 
+<<<<<<< HEAD
 print_r($response);
+=======
+>>>>>>> dalhousie/bit-voting
 echo "Job created, got response:" . PHP_EOL;
 var_dump($result);
 echo "Job ID: " . $response['id'] . PHP_EOL;

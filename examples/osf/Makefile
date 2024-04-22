@@ -161,6 +161,13 @@ endif
 ifneq ($(RNTX),)
     CFLAGS += -DRNTX=$(RNTX)
 endif
+<<<<<<< HEAD
+=======
+ifneq ($(BV),)
+    CFLAGS += -DBV=$(BV)
+endif
+
+>>>>>>> dalhousie/bit-voting
 
 #----------------------------------------------------------------------------#
 # TEST Configuration
