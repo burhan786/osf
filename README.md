@@ -151,6 +151,12 @@ make clean TARGET=nrf52840 && make -j16 node.upload-all TARGET=nrf52840 BOARD=dk
 make clean TARGET=nrf52840 && make -j16 node.upload-all TARGET=nrf52840 BOARD=dk DST=1 SRC=2,3,4 TESTBED=nulltb DEPLOYMENT=nulltb LENGTH=64 PERIOD=1000 CHN=1 LOGGING=1 GPIO=1 LEDS=1 NTX=6 NSLOTS=12 PWR=ZerodBm PROTO=OSF_PROTO_BCAST PHY=PHY_BLE_2M RNTX=1
 ```
 
+#### CTX-vote
+CTX-Vote is a novel packet-level error correction scheme that can handle errors ocurring due to beating.
+```
+make clean TARGET=nrf52840 && make -j16 node.upload-all TARGET=nrf52840 BOARD=dk DEPLOYMENT=nulltb DST=1 SRC=2,3,4 TESTBED=nulltb DEPLOYMENT=nulltb LENGTH=64 PERIOD=1000 CHN=1 LOGGING=1 GPIO=1 LEDS=1 NTX=6 NSLOTS=6 NTA=4 PWR=ZerodBm PROTO=OSF_PROTO_STA DCUBE=1 PHY=PHY_BLE_2M RNTX=1 BV=1
+```
+
 ### Multi-PHY
 
 OSF supports the development of multi-PHY protocols, allowing exploitation of multiple PHYS *in the same protocol*, as well as dynamic selection and (re)configuration of the PHY *at runtime*. OSF provides a naïve implementation of such a protocol, the details of which can be found in the [paper](https://michaelbaddeley.files.wordpress.com/2022/07/baddeley2022osf.pdf).
