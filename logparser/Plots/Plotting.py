@@ -32,6 +32,7 @@ class DataPlotter:
             self.pkt_len = pkt_len
         else:
             self.pkt_len = pkt_len
+    
     def print_dictionary(self, inp_dict):
         """
                 This funcself.bf_v_stats_phywise['BV'][stat_name_t]tion prints the dictionary in a readable format
@@ -41,6 +42,7 @@ class DataPlotter:
 
         formatted_dict = json.dumps(inp_dict, default=str, indent=4)
         print(formatted_dict)
+    
     def get_all_file_paths(self) -> None:
         """
         This function gets the file paths dictionary from the FileReader class
@@ -141,62 +143,37 @@ class DataPlotter:
         :param corrected_error_positions: Dictionary of corrected error positions and their frequencies
         :return: None
         """
-        # Extract error positions and frequencies
-        # if self.isbv:
-        #     self.get_error_positions()
-        # else:
-        #     self.get_error_positions_no_bv()
 
         # Sort the data dictionary by key
         sorted_data = dict(sorted(error_positions.items()))
-        # sys.exit(1)
-        # print('Sorted Data: ',sorted_data)
-        # sys.exit()
         if temperature:
             name_of_fig = self.logs_dir+"/Graphs/"+self.phys_lyr + "_error_positions_"+datetime.datetime.now().strftime("%Y%m%d_%H%M")+"_"+temperature+".pdf"
         else:
             name_of_fig = self.logs_dir+"/Graphs/"+self.phys_lyr + "_error_positions_"+datetime.datetime.now().strftime("%Y%m%d_%H%M")+".pdf"
-        # Extract the sorted values and frequencies
-        # if len(sorted_data) > 0:
-        #     values, frequencies = sorted_data.items()
 
         # Set up the figure and axes
         fig, ax = plt.subplots(figsize=(3, 3))
         # Create the bar plot
         if len(sorted_data) > 0:
-            # ax.bar(list(sorted_data.keys()), list(sorted_data.values()),color=self.CB_color_cycle[0], label="Errors")
-            # print('Sorted Data: ',sorted_data)
             bit_indices = list(sorted_data.keys())
             bit_errors = list(sorted_data.values())
             print('Bit Errors: ',len(bit_errors))
             
             df = pd.DataFrame({'Bit Index':bit_indices, 'Bit Errors':bit_errors})
-            # print(df.head(5))
             sns.set_context("poster", font_scale=7, rc={"lines.linewidth": 2})
             
 
             
             plot = sns.barplot(df,x='Bit Index',y='Bit Errors', color="#00008B", label="Errors", ax=ax)
-            # plot = sns.barplot(x=bit_indices,y=bit_errors, color="#00008B", label="Errors")
-            # Add corrected-errors overlay if corrections occurred
-            # if corrected_error_positions:
-            #     sorted_corrections = dict(sorted(corrected_error_positions.items()))
-            #     ax.bar(list(sorted_corrections.keys()), list(sorted_corrections.values()), color=self.CB_color_cycle[1], label="No. Corrections")
 
             # Set labels and title
             plot.set_xlabel('Bit Index in Packet', weight='bold', fontdict={'size':12})
             plot.set_ylabel('Absolute Errors', weight='bold', fontdict={'size':12})
-            # ax.set_title(plot_title)
-            # ax.legend()
 
             # Remove spines
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
 
-
-            # ax.set_xticklabels(np.arange(0, 2040, 500), weight='bold')
-            # ax.tick_params(axis='y', labelsize=7)
-            # ax.tick_params(axis='x', labelsize=7)
             # # Adjust x-axis tick labels rotation
             if 'BLE' in self.phys_lyr:
                 
@@ -209,11 +186,6 @@ class DataPlotter:
             
             plt.yticks(fontweight='bold', fontsize=12)
             plt.xticks(fontweight='bold', fontsize=12)
-            # ax.set_xticks(np.arange(0, 2501, 500))
-            # ax.set_xticklabels(np.arange(0, 2501, 500))
-            # plt.yscale('log')
-            # plt.ylim(min(sorted_data.values()), max(sorted_data.values()) * 1.1)
-            # plt.xticks(rotation=45)
 
             # Display the plot
             # plt.show()
@@ -243,7 +215,6 @@ class DataPlotter:
             plt.xticks(fontsize=7, weight='bold')
             plt.ylabel("Amplitude", weight='bold', fontsize=7)
             plt.yticks(fontsize=7, weight='bold')
-            # plt.title("FFT Result")
             plt.xlim(1, cutoff_freq)
 
             # plt.tight_layout()
@@ -308,11 +279,8 @@ class DataPlotter:
         """
         
         # Iterate through the dictionary and plot each line
-        # beating_frequency=[]
         stat_vals_each_bv=[]
         stat_vals_each_no_bv=[]
-        # stat_vals_each_bv = [88.2, 77.28, 88.06, 96.48, 95.34]
-        # stat_vals_each_no_bv = [48.83, 21.6, 36.19, 70.18, 76.97]
         markers = {'1M':'s','2M':'o',  '125K':'^', '500K':'D', 'IEEE':'x'}
         width = 0.35
         for phy, phy_stats in inp_dict.items():
@@ -328,7 +296,6 @@ class DataPlotter:
         ax.bar(x - width/2, stat_vals_each_bv, width, label='BV')
         ax.bar(x + width/2, stat_vals_each_no_bv, width, label='No BV')
         ax.set_ylabel(y_label, weight='bold')
-        # ax.set_title(plt_title)
         ax.set_xticks(x)
         ax.set_xticklabels(list(markers.keys()), weight='bold')
         if stat_name == 'Beating_Frequency':
@@ -340,7 +307,6 @@ class DataPlotter:
             ax.tick_params(axis='x', labelsize=7)
         ax.legend(prop={'weight':'bold','size':5}, loc='lower right')
     
-    #Complete this function
     def bar_plot_with_error_bars_phy(self, inp_dict, x_label, y_label, plt_title, stat_name) -> None:
         """
             This function plots a bar plot the PDR for all PHY layers
@@ -628,30 +594,6 @@ class DataPlotter:
         
         # Iterate through the dictionary and plot each line
 
-        # markers = {'PHY_BLE_1M':'o', 'PHY_BLE_2M':'s', 'PHY_BLE_125K':'D', 'PHY_BLE_500K':'^'}
-        # # plt.figure(figsize=(5, 5))
-        # plt.subplots_adjust(right=0.6, top=0.9, bottom=0.1, left=0.1)
-        # for phy, phy_stats in inp_dict.items():
-        #     print('------------------ PHY: ',phy,'--------------------')
-        #     bv_data = phy_stats['BV']
-        #     no_bv_data = phy_stats['No_BV']
-        #     plt.scatter(bv_data['BF'], bv_data[stat_name], label=phy+" "+'BV', marker=markers[phy])
-        #     plt.scatter(no_bv_data['BF'], no_bv_data[stat_name], label=phy+" "+'No_BV', marker=markers[phy])
-
-        # # Set labels and title
-        # plt.yticks(np.arange(0,101,5))
-        # # plt.xticks(np.arange(0,5001,500))
-        # plt.xlabel(x_label)
-        # plt.ylabel(y_label)
-        # plt.title(plt_title)
-
-        # # Add a legend
-        # plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
-
-        # Show the plot
-        # plt.show()
-
-
         stat_vals_each_bv=[]
         stat_vals_each_no_bv=[]
         markers = {'PHY_BLE_2M':'s','PHY_BLE_1M':'o',  'PHY_BLE_500K':'^', 'PHY_BLE_125K':'D'}
@@ -709,7 +651,6 @@ class DataPlotter:
                 plt.scatter(inp_dict['No_BV']['BF'], inp_dict['No_BV'][stat_name], label=physical_layer+" "+'No_BV', marker=markers[physical_layer])
 
         # Set labels and title
-        # plt.yticks(np.arange(0,101,5))
         plt.xticks(np.arange(0,5001,500))
         plt.xlabel(x_label)
         plt.ylabel(y_label)
@@ -717,7 +658,6 @@ class DataPlotter:
 
         # Add a legend
         plt.legend()
-        # plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         # Show the plot
         # plt.show()

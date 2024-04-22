@@ -167,7 +167,6 @@ class StatsPlotter:
 
 		reader = FileReader(path)
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -211,7 +210,6 @@ class StatsPlotter:
 
 		reader = FileReader(path)
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, physical_layer, 255, False)
 		csv_files_tempwise = csv_files_dict[physical_layer]
 		auxiliary_corrections = []
@@ -268,9 +266,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = None
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -380,9 +375,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = stat_name
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -392,7 +384,6 @@ class StatsPlotter:
 		#BV
 		print('--------------BV------------------')
 		print(f"--------------- PHY: {physical_layer} -----------------------")
-		# sys.exit(1)
 		physical_layer_dict_bv = dict(sorted(csv_files_dict_bv[physical_layer].items()))
 		physical_layer_dict_no_bv = dict(sorted(csv_files_dict_no_bv[physical_layer].items()))
 		for (temperature_bv, csv_files_bv), (temperature_no_bv, csv_files_no_bv) in zip(physical_layer_dict_bv.items(), physical_layer_dict_no_bv.items()):

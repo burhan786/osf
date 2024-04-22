@@ -1,3 +1,10 @@
+"""
+This script is used to compile the osf project and post jobs on D-cube testbed.
+
+Author: Burhanuddin Rangwala
+
+"""
+
 import subprocess
 import argparse
 import sys

@@ -104,12 +104,12 @@ class Parser:
             log_data = ansi_escape.sub('', log)
             if "Packet" not in log_data:
                 log_data = log.split(" ")
-                # print(log_data)
+
                 time_stamp = log_data[0]+" "+log_data[1]
                 self.data_dict["TIMESTAMP"] = time_stamp
             
                 log_data = log_data[2].split(",")
-                # print(log_data)
+
                 if len(log_data) == 8:
                     round_num = log_data[1].split(":")[-1]
                     print("---------------------round_num: ", round_num, "----------------------")
@@ -142,7 +142,7 @@ class Parser:
                     print(self.data_dict)
                     self.update_dataframe()
                     print('-----------------------------------------------------------------------')
-                    # sys.exit()
+
         csv_file_nm = self.write_to_csv_file()
         self.reset_dataframe()
 
@@ -161,7 +161,7 @@ class Parser:
             log_data = ansi_escape.sub('', log)
             if "Packet" not in log_data:
                 log_data = log.split(" ")
-                # print(log_data)
+
                 time_stamp = log_data[0]+" "+log_data[1]
                 self.data_dict["TIMESTAMP"] = time_stamp
                 log_data = log_data[2].split(",")

@@ -57,10 +57,7 @@ class DcubeLogParser:
                     bv_scs_flag = int(match.group(6))
                     errs = '{'+match.group(7)+'}'
                     slts = match.group(8)
-                    # if epoch >= 60:
                     data.append([timestamp, epoch, n_rx, n_err_pkts, bv_count, bv_scs_flag, errs, slts])
-                        # print([timestamp, epoch, n_rx, n_err_pkts, bv_count, bv_scs_flag, errs, slts])
-                        # sys.exit(1)
 
         # Write the extracted data to a CSV file
         with open(self.csv_file, 'w', newline='') as f:
@@ -73,6 +70,10 @@ class DcubeLogParser:
     def parse_logs_bv_tempwise(self, start_temp, end_temp, temp_increase_interval, time_increase_interval) -> None:
         """
         This function parses the log file when bit voting is enabled and stores the data in a CSV file
+        :param start_temp: Start temperature
+        :param end_temp: End temperature
+        :param temp_increase_interval: Temperature increase step value
+        :param time_increase_interval: Time increase step value
         :return: None
         """
 
@@ -97,17 +98,12 @@ class DcubeLogParser:
                     bv_scs_flag = int(match.group(6))
                     errs = '{'+match.group(7)+'}'
                     slts = match.group(8)
-                    # if epoch >= 60:
                     data.append([timestamp, epoch, n_rx, n_err_pkts, bv_count, bv_scs_flag, errs, slts])
-                        # print([timestamp, epoch, n_rx, n_err_pkts, bv_count, bv_scs_flag, errs, slts])
-                        # sys.exit(1)
                     if not found_first_timestamp:
                         start_time = timestamp
                         found_first_timestamp = True
                         end_time = start_time + pd.Timedelta(minutes=time_increase_interval)
                         current_temp = start_temp
-                        # print(data)
-                        # sys.exit(1)
                     
                     if timestamp >= end_time:
                         start_time = timestamp
@@ -117,27 +113,24 @@ class DcubeLogParser:
                         
                         if current_temp > end_temp:
                             current_temp = start_temp
-                        # print(len((data)))
                         # Write the extracted data to a CSV file
                         with open(csv_filename, 'w', newline='') as f:
                             csv_writer = csv.writer(f)
                             csv_writer.writerow(["Timestamp", "ROUND", "N_RX", "N_ERR_PKTS", "BV_COUNT", "BV_SCS_FLAG", "ERRS", "SLOTS"])
                             csv_writer.writerows(data)
-                        # print('before resetting: ', data)
                         data = []
-                        # print('after resetting: ', data)
                         print(f"Parsed logs have been written to {csv_filename}")
         if len(data) > 0:
             csv_filename = self.csv_file_dir+"/output_"+self.log_file.split("/")[1].split(".")[0]+"_"+str(current_temp)+"C.csv"
-            # print(len((data)))
+
             # Write the extracted data to a CSV file
             with open(csv_filename, 'w', newline='') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow(["Timestamp", "ROUND", "N_RX", "N_ERR_PKTS", "BV_COUNT", "BV_SCS_FLAG", "ERRS", "SLOTS"])
                 csv_writer.writerows(data)
-            # print('before resetting: ', data)
+
             data = []
-            # print('after resetting: ', data)
+
             print(f"Parsed logs have been written to {csv_filename}")
 
     def parse_logs_no_bv(self) -> None:
@@ -158,10 +151,7 @@ class DcubeLogParser:
                 data_dict = {}
                 data_dict['TIMESTAMP'] = timestamp
                 data = data.split(",")
-                # print(len(data))
                 if len(data) == 5:
-                    # print('data: ',data)
-                    # if int(data[0].split(":")[1]) >= 60:
                     for entry in data:
                         key, value = entry.split(':', 1)
                         if key == 'SLTS':
@@ -169,7 +159,6 @@ class DcubeLogParser:
                         if key == 'EP':
                             key = 'ROUND'
                         data_dict[key] = value
-                    # print(data_dict)
                     parsed_logs.append(data_dict)
 
 
@@ -183,6 +172,10 @@ class DcubeLogParser:
     def parse_logs_no_bv_tempwise(self, start_temp, end_temp, temp_increase_interval, time_increase_interval) -> None:
         """
         This function parses the log file when bit voting is disabled and stores the data in a CSV file temperature wise
+        :param start_temp: Start temperature
+        :param end_temp: End temperature
+        :param temp_increase_interval: Temperature increase step value
+        :param time_increase_interval: Time increase step value
         :return: None
         """
 
@@ -198,17 +191,12 @@ class DcubeLogParser:
                 data_dict = {}
                 data_dict['TIMESTAMP'] = pd.to_datetime(timestamp)
                 data = data.split(",")
-                # print(len(data))
                 if len(data) == 5:
-                    # print('data: ',data)
-                    # if int(data[0].split(":")[1]) >= 60:
                     if not found_first_timestamp:
                         start_time = data_dict['TIMESTAMP']
                         found_first_timestamp = True
                         end_time = start_time + pd.Timedelta(minutes=time_increase_interval)
                         current_temp = start_temp
-                        # print(data)
-                        # sys.exit(1)
                     if data_dict['TIMESTAMP'] >= end_time:
                         start_time = data_dict['TIMESTAMP']
                         end_time = start_time + pd.Timedelta(minutes=time_increase_interval)
@@ -217,15 +205,12 @@ class DcubeLogParser:
                         
                         if current_temp > end_temp:
                             current_temp = start_temp
-                        # print(len((data)))
                         # Write the extracted data to a CSV file
                         with open(csv_filename, 'w', newline='') as f:
                             writer = csv.DictWriter(f, fieldnames=csv_header)
                             writer.writeheader()
                             writer.writerows(parsed_logs)
-                        # print('before resetting: ', parsed_logs)
                         parsed_logs = []
-                        # print('after resetting: ', parsed_logs)
                         print(f"Parsed logs have been written to {csv_filename}")
                     
                     for entry in data:
@@ -235,7 +220,6 @@ class DcubeLogParser:
                         if key == 'EP':
                             key = 'ROUND'
                         data_dict[key] = value
-                    # print(data_dict)
                     parsed_logs.append(data_dict)
 
 
@@ -288,8 +272,6 @@ class DcubeLogParser:
         if self.is_bv:
             print('---------Bit Voting Effectiveness---------\n')
             stat_calc.calc_bit_voting_effectiveness()
-            # stat_calc.calc_error_corrected_error_positions()
-        # else:
         stat_calc.calc_error_positions()
         if self.tempwise:
             stat_calc.write_stats_tempwise()
@@ -312,7 +294,6 @@ class DcubeLogParser:
         else:
             plt_title = f'Bit Errors vs Bit Corrections per index:{self.physical_layer}, pkt_len:{self.pkt_len}, temp:{temperature}'
         plotter.plot_error_positions(err_pos, plt_title, temperature,corr_err_pos)
-        # time.sleep(10)
     
     def normalize_frequencies(self, error_position_frequency):
         max_freq = max(error_position_frequency.values())
@@ -417,8 +398,6 @@ if __name__ == '__main__':
         if parser.tempwise:
             error_tmpwise_dict = stat_calc.get_error_positions_tempwise_dictionary()
             corrected_tmpwise_dict = stat_calc.get_corrected_error_positions_tempwise_dictionary()
-            # print(error_tmpwise_dict.keys())
-            # print(corrected_tmpwise_dict.keys())
 
             for err_temp, corr_err_temp in zip(error_tmpwise_dict.keys(), corrected_tmpwise_dict.keys()):
                 print('--------- Plotting Error Positions for temperature: ', err_temp, corr_err_temp,' ---------\n')

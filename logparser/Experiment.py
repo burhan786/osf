@@ -1,3 +1,24 @@
+"""
+This script helps to run the experiment for the given physical layer and payload length on your local machine.
+It compiles the contiki application, flashes it to the JLink device, runs picocom to get the logs from the JLink device,
+parses the logs, calculates the required statistics and plots the data.
+
+The script can be run using the following example command:
+python3 Experiment.py -pldlen 50 -s 1 -d 2 -f 3 -p 0dBm -bv 1 -phy PHY_BLE_2M -dur 1
+
+The arguments are as follows:
+-pldlen: Payload length in bytes
+-s: Source node ID
+-d: Destination node ID
+-f: Forwarder node ID
+-p: Transmit Power level of the nodes
+-bv: Enable Bit voting the error correction mechanism
+-phy: Physical layer to be used for the experiment
+-dur: Duration in minutes the experiment should run
+
+Author: Burhanuddin Rangwala
+"""
+
 import datetime
 import subprocess
 from add_timestamp import AddTS
@@ -11,6 +32,7 @@ from statistics import StatsCalculator
 from fft_calculator import FFTCalculator
 import re
 import json
+
 class Experiment:
     def __init__(self, pl, pd_len,source, destination, forwarder, power, dur) -> None:
         self.physical_layer = pl #Name of the physical layer used for the experiment
@@ -126,38 +148,13 @@ class Experiment:
         output_file = open(self.picocom_output_file, "a")
         packet_number = 0
         stop_value = 20
-        # Read the output from both processes
-        # while True:
-        while not timestamp.is_next_window():
-            # Read and process the output from the source process
-            # try:
-            # #     source_output = source_process.stdout.readline().decode().strip()
-            # #     print('source: ', source_output)
-            # # except UnicodeDecodeError:
-            # #     pass
-            # # try:
-            # #     if source_output and 'Packet_number' in source_output:
-            # #         source_output = ansi_escape.sub('', source_output)
-            # #         # Check if the packet number reaches the stop value
-            # #         packet_number = int(source_output.split(':')[-1].strip())  # Assuming packet number is the first value
-            # #         print('Source Packet_number: ', packet_number)
-            # #         print('-----------------------------')
-            # #         stop_value = 20  # Change this to your desired stop value
-            # #         if packet_number >= stop_value:
-            # #             # Terminate both processes if the stop value is reached
-            # #             print(f'---Packet number {packet_number} reached the stop value {stop_value}---')
-            # #             source_process.stdin.flush()
-            # #             source_process.stdin.write(b'\x01\x18')
-            # #             source_process.stdin.flush()
-            # #             source_process.wait()
-            # # except TypeError:
-            # #     pass
-            
+        # Read the output from both destination process
+
+        while not timestamp.is_next_window():            
             try:
                 # Read and process the output from the destination process
                 destination_output = destination_process.stdout.readline().decode().strip()
                 destination_output = ansi_escape.sub('', destination_output)
-                # print('destination: ', destination_output)
                 if destination_output:
                     # Timestamp the destination output
                         to_be_written = '['+datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+']'+" "+ destination_output
@@ -166,25 +163,19 @@ class Experiment:
                         print('-----------------------------')
                         output_file.write(to_be_written + '\n')
                         output_file.flush()
-                        # if packet_number >= stop_value:
-                        #     source_process.stdin.flush()
-                            # destination_process.stdin.write(b'\x01\x18')
-                            # destination_process.stdin.flush()
-                            # destination_process.wait()
-                            # break
             except UnicodeDecodeError:
                 pass
             except TypeError:
                 pass
         output_file.close()
-        # source_process.terminate()
         # destination_process.terminate()
         return log_folder
     
     def make_csvs(self, logs_dir):
         """
         This function makes the CSVs from the logs
-        :return: None
+        :param logs_dir: Directory containing the logs
+        :return: Name of the CSV file where the parsed data is written
         """
 
         print('Making CSVs...')
@@ -196,6 +187,7 @@ class Experiment:
     def plot_data(self, logs_dir):
         """
         This function plots the data from the CSVs and calculates required metrics
+        :param logs_dir: Directory containing the logs
         :return: None
         """
 
@@ -203,10 +195,6 @@ class Experiment:
         plotter = DataPlotter(self.logs_dir,logs_dir, (self.packet_length+9), self.is_bv)
         plotter.set_physical_layer(self.physical_layer)
         plotter.get_all_file_paths()
-        # print(max(self.errs_collection))
-        
-        # self.print_dictionary(self.errs_collection)
-        # sys.exit(0)
         plotter.plot_error_positions(self.errs_collection, 'Beating Graph')
         # plotter.plot_fft(self.smp_freq, self.pwr, self.cutoff_freq)
 
@@ -232,8 +220,6 @@ class Experiment:
         fft_calculator = FFTCalculator(self.logs_dir, self.physical_layer, self.is_bv)
         self.smp_freq, self.pwr, self.cutoff_freq = fft_calculator.fft_calculator(stats.get_error_positions_dictionary())
         self.errs_collection = stats.get_error_positions_dictionary()
-        # self.print_dictionary(self.errs_collection)
-        # sys.exit(0)
 
 def main():
     """
@@ -242,8 +228,6 @@ def main():
     """
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-mdir', '--main_directory', type=str, help='Experiment duration in seconds', required=False)
-    arg_parser.add_argument('-cfile', '--csvfile',type=str, help='CSV file path', required=False)
     arg_parser.add_argument('-pldlen', '--payload_length', type=int, help='Payload length in bytes', required=True)
     arg_parser.add_argument('-s', '--src', type=int, help='Source node ID', required=True)
     arg_parser.add_argument('-d', '--dst', type=int, help='Destination node ID', required=True)
@@ -261,9 +245,8 @@ def main():
         arg_parser.print_help()
         sys.exit(1)
 
-    #for phy in ['PHY_BLE_2M','PHY_BLE_1M', 'PHY_BLE_125K', 'PHY_BLE_500K','PHY_IEEE']:
-    # for phy in ['PHY_BLE_2M']:
-    phy = args.physical_layer
+    #for phy in ['PHY_BLE_2M','PHY_BLE_1M', 'PHY_BLE_125K', 'PHY_BLE_500K','PHY_IEEE']: Can be uncommented to run the experiment for all the physical layers
+    phy = args.physical_layer # to comment this out if the above for loop is used.
     if phy:
         print(f'Running experiment for {phy}....')
         if args.payload_length > 116 and phy == 'PHY_IEEE':
@@ -274,13 +257,10 @@ def main():
             exp.is_bv = True
         exp.set_logs_dir()
         exp.logs_dir = args.main_directory
-        # exp.get_destination_port()
-        # exp.compile_experiment()
-        # txt_log_dir = exp.run_picocom()
-        # print('txt_log_dir', txt_log_dir)
-        # csv_fl_nm = exp.make_csvs(txt_log_dir)
-        txt_log_dir = args.main_directory
-        csv_fl_nm = args.csvfile
+        exp.get_destination_port()
+        exp.compile_experiment()
+        txt_log_dir = exp.run_picocom()
+        csv_fl_nm = exp.make_csvs(txt_log_dir)
         exp.get_statistics(txt_log_dir, csv_fl_nm)
         exp.plot_data(txt_log_dir)
         print('Experiment done...')

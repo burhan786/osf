@@ -146,7 +146,6 @@ rx_ok(uint8_t rnd_type, uint8_t *data, uint8_t data_len)
   exp_hdr->slot = osf.slot;
 
   if (was_out_of_sync == 1 && pkt_flag == 1) {
-    // PRINT("resync\n");
     uint16_t tmp = (osf.epoch-1) % 3;
     tmp = (osf.epoch-1) - tmp;
     resync(rnd_pkt->id, tmp);

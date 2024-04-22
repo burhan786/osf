@@ -32,7 +32,6 @@ class FileReader:
         :return: list of log file paths
         """
         file_names = os.listdir(self.directory_path)
-        # print(file_names)
         # Sort the file names based on modification time
         sorted_file_names = sorted(file_names, key=lambda x: os.path.getmtime(os.path.join(self.directory_path+'/'+x)))
         # Read the files in the sorted order
@@ -42,7 +41,6 @@ class FileReader:
             print('------------Adding file: ', file_path, ' ------------')
             # Check if the path is a file
             if os.path.isfile(file_path):
-                # print('Inside if')
                 self.filedirectory.append(file_path)
         
         return self.filedirectory
@@ -55,12 +53,9 @@ class FileReader:
         self.filedirectory = []
         actual_csv_file_path = self.directory_path if not path else path 
         actual_csv_file_path += '/CSVFiles'
-        # print('Actual CSV File Path:', actual_csv_file_path)
-        # sys.exit()
         if os.path.isdir(actual_csv_file_path):
             file_names = os.listdir(actual_csv_file_path)
-            # print(file_names)
-            # sys.exit()
+
             # Sort the file names based on modification time
             sorted_file_names = sorted(file_names, key=lambda x: os.path.getmtime(os.path.join(actual_csv_file_path, x)))
             # Read the files in the sorted order
@@ -68,7 +63,6 @@ class FileReader:
                 # Construct the full file path
                 if filename.endswith('.csv'):
                     file_path = os.path.join(actual_csv_file_path, filename)
-                    # print('------------Adding file: ', file_path, ' ------------')
                     # Check if the path is a file
                     if os.path.isfile(file_path):
                         self.filedirectory.append(file_path)
@@ -94,8 +88,6 @@ class FileReader:
                     if os.path.exists(csv_file_path):
                         phy_layer_csv_files[phy_dir].append(csv_file_path)
                     
-            # formatted_dict = json.dumps(phy_layer_csv_files, indent=4)
-            # print(formatted_dict)
         else:
             for dir in dir_list:
                 dir = os.path.join(dir, 'No_BV')
@@ -104,34 +96,28 @@ class FileReader:
                     csv_file_path = os.path.join(dir, phy_dir, f'statistics_{phy_dir}_no_bv.csv')
                     if os.path.exists(csv_file_path):
                         phy_layer_csv_files[phy_dir].append(csv_file_path)
-                    
-            # formatted_dict = json.dumps(phy_layer_csv_files, indent=4)
-            # print(formatted_dict)            
+                               
         
         return phy_layer_csv_files
 
     def get_dcube_raw_csv_files(self, src, fwd, dst):
         
         dir_list = self.get_log_file_directories()
-        # print('List of directories:', dir_list)
         phy_layer_csv_files = {'PHY_BLE_2M':[], 'PHY_BLE_1M':[], 'PHY_BLE_500K':[], 'PHY_BLE_125K':[]}
         phy_layer_csv_files_no_bv = {'PHY_BLE_2M':[], 'PHY_BLE_1M':[], 'PHY_BLE_500K':[], 'PHY_BLE_125K':[]}
         pair_dir_list = []
-        # bv_files = []
-        # no_bv_files = []
 
         for dir in dir_list:
             if src in dir and fwd in dir and dst in dir:
                 print('------------Adding Directory: ', dir, ' ------------')
                 pair_dir_list.append(dir)
-        # print('Pair Directory List:', pair_dir_list)
+
         for dir in pair_dir_list:
             dir = os.path.join(dir, 'With_BV')
             phy_dirs_list = os.listdir(dir)
             for phy_dir in phy_dirs_list:
                 files = os.listdir(os.path.join(dir, phy_dir))
-                # print(files)
-                # sys.exit()
+
                 for file in files:
                     if 'logs' in file and os.path.isdir(os.path.join(dir, phy_dir, file)):
                         phy_layer_csv_files[phy_dir].append(self.get_csv_file_paths(os.path.join(dir, phy_dir, file)))
@@ -143,7 +129,7 @@ class FileReader:
                 files = os.listdir(os.path.join(dir, phy_dir))
                 for file in files:
                     if 'logs' in file and os.path.isdir(os.path.join(dir, phy_dir, file)):
-                        # print('file_considered:', os.path.join(dir, phy_dir, file))
+
                         phy_layer_csv_files_no_bv[phy_dir].append(self.get_csv_file_paths(os.path.join(dir, phy_dir, file)))
         
         return phy_layer_csv_files, phy_layer_csv_files_no_bv
@@ -159,15 +145,12 @@ class FileReader:
             :return: dictionary of csv files
         """
         dir_list = self.get_log_file_directories()
-        # print('List of directories:', dir_list)
         phy_layer_csv_files = {'PHY_BLE_2M':[], 'PHY_BLE_1M':[], 'PHY_BLE_500K':[], 'PHY_BLE_125K':[]}
-        # phy_layer_csv_files_no_bv = {'PHY_BLE_2M':[], 'PHY_BLE_1M':[], 'PHY_BLE_500K':[], 'PHY_BLE_125K':[]}
         pair_dir_list = []
 
         for dir in dir_list:
             if src in dir and fwd in dir and dst in dir:
                 pair_dir_list.append(dir)
-        # print('Pair Directory List:', pair_dir_list)
 
         if bv:
             for dir in pair_dir_list:
@@ -178,8 +161,6 @@ class FileReader:
                     if os.path.exists(csv_file_path):
                         phy_layer_csv_files[phy_dir].append(csv_file_path)
                     
-            # formatted_dict = json.dumps(phy_layer_csv_files_bv, indent=4)
-            # print(formatted_dict)
         else:
             for dir in pair_dir_list:
                 dir = os.path.join(dir, 'No_BV')
@@ -188,9 +169,6 @@ class FileReader:
                     csv_file_path = os.path.join(dir, phy_dir, f'statistics_{phy_dir}_no_bv.csv')
                     if os.path.exists(csv_file_path):
                         phy_layer_csv_files[phy_dir].append(csv_file_path)
-        
-        # formatted_dict = json.dumps(phy_layer_csv_files_no_bv, indent=4)
-        # print(formatted_dict)
         
         return phy_layer_csv_files
 
@@ -205,16 +183,12 @@ class FileReader:
             :return: dictionary of csv files
         """
         dir_list = self.get_log_file_directories()
-        # print('List of directories:', dir_list)
         phy_layer_csv_files = {'PHY_BLE_2M':{}, 'PHY_BLE_1M':{}, 'PHY_BLE_500K':{}, 'PHY_BLE_125K':{}}
-        # phy_layer_csv_files_no_bv = {'PHY_BLE_2M':[], 'PHY_BLE_1M':[], 'PHY_BLE_500K':[], 'PHY_BLE_125K':[]}
         pair_dir_list = []
 
         for dir in dir_list:
-            # print('Directory:', dir)
             if src in dir and fwd in dir and dst in dir:
                 pair_dir_list.append(dir)
-        # print('Pair Directory List:', pair_dir_list)
 
         if bv:
             for dir in pair_dir_list:
@@ -231,8 +205,6 @@ class FileReader:
                                     phy_layer_csv_files[phy_dir][temperature] = []
                                 phy_layer_csv_files[phy_dir][temperature].append(csv_file_path)
                     
-            # formatted_dict = json.dumps(phy_layer_csv_files_bv, indent=4)
-            # print(formatted_dict)
         else:
             for dir in pair_dir_list:
                 dir = os.path.join(dir, 'No_BV')
@@ -248,7 +220,4 @@ class FileReader:
                                     phy_layer_csv_files[phy_dir][temperature] = []
                                 phy_layer_csv_files[phy_dir][temperature].append(csv_file_path)
         
-        # formatted_dict = json.dumps(phy_layer_csv_files_no_bv, indent=4)
-        # print(formatted_dict)
-        # sys.exit(1)
         return phy_layer_csv_files

@@ -171,10 +171,6 @@ class StatsPlotter:
 		# csv_files_dict_no_bv = reader_no_bv.get_dcube_csv_files_pair(False, str(src), str(fwd), str(dst))
 		csv_files_dict_bv = reader_bv.get_dcube_stat_csv_files(True)
 		csv_files_dict_no_bv = reader_no_bv.get_dcube_stat_csv_files(False)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
-		# self.print_dictionary(csv_files_dict_no_bv.items())
-		# sys.exit(1)
 		stat_name_t = stat_name
 
 		if stat_name == 'PER':
@@ -202,7 +198,6 @@ class StatsPlotter:
 						aux_no_bv_stat.append(data_no_bv[stat_name].values[0])
 					aux_bv_bf.append(0 if math.isnan(data_bv['Beating_Frequency'].values[0]) else data_bv['Beating_Frequency'].values[0])
 					aux_no_bv_bf.append(0 if math.isnan(data_no_bv['Beating_Frequency'].values[0]) else data_no_bv['Beating_Frequency'].values[0])
-				# self.print_dictionary(self.bf_v_stat[phy])
 				print('--------------------------------------------------------')
 			print("BV_stat: ",aux_bv_stat)
 			print("No_BV_stat: ", aux_no_bv_stat)
@@ -218,7 +213,6 @@ class StatsPlotter:
 			print('\n ---------------------- Complete Dictionary ----------------------------------- \n')
 			self.print_dictionary(self.bf_v_stat)       
 			print('\n --------------------------------------------------------- \n')
-		# sys.exit(1)
 		x_l = 'Physical Layer (PHY)'
 		y_l = stat_name + " (%)"
 		plot_title = f'Physical_Layer vs {stat_name}'

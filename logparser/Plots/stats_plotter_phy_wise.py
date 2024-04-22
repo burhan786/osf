@@ -9,105 +9,6 @@ import datetime
 import argparse
 import sys
 
-def make_box_plot() -> None:
-    """
-        This function creates box plots for each physical layer.
-        The plot is drawn for PRR values for each physical layer for the cases when BV is used and when BV is not used.
-        The values are divided into 5 categories based on the packet size.
-        :return: None
-    """
-
-    pkt_size_prr_vals_dict = {16:{
-        '1M':{'BV':[91.33,39.74,20.77,90.41,41.84],
-              'NO_BV':[86.44,85.9,7.96,85.11,14.56]},
-        '2M':{'BV':[53.25,35.61,19.24,95.34,54.54],
-              'NO_BV':[12.92,60.29,74.85,16.58,47.38],},
-        '125K':{'BV':[71.35,67.79,54.05,83.33,71.89],
-                'NO_BV':[73.51,92.30,67.7,76.31,63.1]},
-        '500K':{'BV':[82.03,84.79,68.57,93.22,68.85],
-                'NO_BV':[93.15,57.94,88.05,83.57,56.99]},
-        'IEEE':{'BV':[69.94,100,89.2,81.08,67.36],
-                'NO_BV':[73.36,80.11,69.51,72.92,79.16]}, 
-    },
-                              32:{
-                                '1M':{'BV':[83.33,89.85,81.7,50.7,77.7],
-                                      'NO_BV':[81.39,79.76,81.43,77.38,52.19]},
-                                '2M':{'BV':[65.11,60.69,40.92,64.86,40.9],
-                                      'NO_BV':[51.74,28.95,50,38.86,55.02]},
-                                '125K':{'BV':[75.12,69.35,60.65,56.57,50],
-                                        'NO_BV':[65.64,59.53,49.75,66.52,58.48]},
-                                '500K':{'BV':[42.91,87.58,83.73,41.47,80.12],
-                                        'NO_BV':[75.72,82.91,81.5,85.79,45.96]},
-                                'IEEE':{'BV':[73.51,77.43,55.94,74.85,50.23],
-                                          'NO_BV':[76.68,87.01,64.28,85.23,72.34]},
-                                
-                              },
-                              64:{
-                                '1M':{'BV':[71.28,70.98,66.81,69.13,67.06],
-                                      'NO_BV':[57.39,45.55,74.40,71.83,64.13]},
-                                '2M':{'BV':[37.03,30,27.62,73.48,22.97],
-                                      'NO_BV':[33.46,4.65,48.7,2.97,28.85]},
-                                '125K':{'BV':[40.75,45.93,42.36,38.98,71.6],
-                                        'NO_BV':[33,51.4,41.84,40.64,40.4]},
-                                '500K':{'BV':[59.56,72.25,71.3,60.38,75.65],
-                                        'NO_BV':[73.18,59.92,51.39,67.77,56.95]},
-                                'IEEE':{'BV':[44.48,64.34,59.06,68.68,60.89],
-                                          'NO_BV':[50.89,55.41,42.47,70.61,46.64]},
-                              },
-                              125:{
-                                '1M':{'BV':[58.76,60.09,54.14,60.91,47.88],
-                                      'NO_BV':[50.44,46.88,44.67,55.17,46]},
-                                '2M':{'BV':[26.55,15.98,30.79,15.5,32.58],
-                                      'NO_BV':[27.4,2.9,35.94,5.86,15.2]},
-                                '125K':{'BV':[18.55,28.44,15.38,45.11,21.23],
-                                        'NO_BV':[14.21,49.35,9.61,22.58,16.9]},
-                                '500K':{'BV':[43.16,45.74,40.25,57.48,49.49],
-                                        'NO_BV':[41.53,56.83,43.94,50.86,50.42]},
-                                'IEEE':{'BV':[23.62,34.71,43.63,42.7,32.58],
-                                          'NO_BV':[25.5,37.14,30.31,34.07,22.01]},
-                              },
-                              255:{
-                                '1M':{'BV':[47.36,38.65,32.69,52.87,25.4],
-                                      'NO_BV':[34.72,29.81,45.28,38.7,19.43]},
-                                '2M':{'BV':[27.51,36.25,27.62,15.87,14.99],
-                                      'NO_BV':[24.92,2.73,16.26,33.33,36.23]},
-                                '125K':{'BV':[8.87,16.63,11.71,36.9,15.08],
-                                        'NO_BV':[3.86,13.51,1.86,3.83,4.07]},
-                                '500K':{'BV':[34.81,37.37,25.41,41.69,25.25],
-                                        'NO_BV':[30,11.32,24.81,26.54,19.67]},
-                              }}
-    packet_sizes = list(pkt_size_prr_vals_dict.keys())
-    prr_values = {}
-
-    for pkt_size, pkt_size_data in pkt_size_prr_vals_dict.items():
-        for phy_layer, prr_data in pkt_size_data.items():
-            for modulation, values in prr_data.items():
-                key = (pkt_size, phy_layer, modulation)
-                prr_values[key] = values
-    # print(prr_values)
-    # Create box plots for each packet size
-    for pkt_size in packet_sizes:
-        fig, ax = plt.subplots()
-        ax.boxplot([prr_values[(pkt_size, phy_layer, 'BV')] for phy_layer in pkt_size_prr_vals_dict[pkt_size].keys()],
-                labels=list(pkt_size_prr_vals_dict[pkt_size].keys()))
-        
-        ax.set_title(f'Box Plot for Packet Size {pkt_size}')
-        ax.set_xlabel('Physical Layer')
-        ax.set_ylabel('PRR Values (%)')
-        
-        plt.savefig(f'./Boxplots/box_plot_{pkt_size}.png')
-    
-    for pkt_size, pkt_size_data in pkt_size_prr_vals_dict.items():
-        print(f"Packet Size: {pkt_size}")
-        for phy_layer, prr_data in pkt_size_data.items():
-            bv_average = sum(prr_data['BV']) / len(prr_data['BV'])
-            nobv_average = sum(prr_data['NO_BV']) / len(prr_data['NO_BV'])
-            print(f"Physical Layer: {phy_layer}")
-            print(f"Average BV: {bv_average:.2f}")
-            print(f"Average NO_BV: {nobv_average:.2f}")
-        print()
-
-
 class StatsPlotter:
 
 	def __init__(self) -> None:
@@ -180,7 +81,6 @@ class StatsPlotter:
 			csv_files_dict = reader.get_dcube_stat_csv_files(bv)
 		else:
 			csv_files_dict = reader.get_dcube_csv_files_pair(bv, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 		for phy, phy_stat_csv_files in csv_files_dict.items():
@@ -192,7 +92,6 @@ class StatsPlotter:
 				if not data.empty:
 					self.bf_v_stat[phy][stat_name].append(data[stat_name].values[0])
 					self.bf_v_stat[phy]['Beating Frequency'].append(data['Beating_Frequency'].values[0])
-				# self.print_dictionary(self.bf_v_stat[phy])
 				print('--------------------------------------------------------')
 
 		print('\n ---------------------- Complete Dictionary ----------------------------------- \n')
@@ -366,7 +265,6 @@ class StatsPlotter:
 		plot_title = f'{stat_name} vs Temperature'
 
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -390,7 +288,6 @@ class StatsPlotter:
 		
 		plt.show()
 
-	#Complete this function
 	def plot_avg_prr_v_temperature_one_phy(self, heating_node, src, fwd, dst, stat_name, physical_layer):
 		"""
 			This function plots the PDR/PRR/PER vs temperature for a specific physical layer.
@@ -518,9 +415,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = None
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -535,9 +429,7 @@ class StatsPlotter:
 			auxiliary_bf_bv = []
 			auxiliary_stat_no_bv = []
 			auxiliary_bf_no_bv = []
-			# print(phy_stat_csv_files[temperature])
 			print(f"--------------- Temperature: {temperature} -----------------------")
-			# sys.exit(1)
 			for (csv_file_bv, csv_file_no_bv) in zip(phy_stat_bv_csv_files[temperature], phy_stat_no_bv_csv_files[temperature]):
 				print(f"Reading file {csv_file_bv}\n")
 				print(f"Reading file {csv_file_no_bv}\n")
@@ -616,7 +508,6 @@ class StatsPlotter:
 		}}
 
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -673,7 +564,6 @@ class StatsPlotter:
 
 		reader = FileReader(path)
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -717,7 +607,6 @@ class StatsPlotter:
 
 		reader = FileReader(path)
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, physical_layer, 255, False)
 		csv_files_tempwise = csv_files_dict[physical_layer]
 		auxiliary_corrections = []
@@ -774,9 +663,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = None
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -786,7 +672,7 @@ class StatsPlotter:
 		csv_files_tempwise_no_bv = dict(sorted(csv_files_dict_no_bv[physical_layer].items()))
 		self.print_dictionary(csv_files_tempwise_bv)
 		self.print_dictionary(csv_files_tempwise_no_bv)
-		# sys.exit(1)
+
 		#BV
 		print('--------------BV------------------')
 		for (temperature_bv, phy_stat_bv_csv_files),(temperature_no_bv, phy_stat_no_bv_csv_files) in zip(csv_files_tempwise_bv.items(), csv_files_tempwise_no_bv.items()):
@@ -795,7 +681,6 @@ class StatsPlotter:
 			auxiliary_bf_bv = []
 			auxiliary_stat_no_bv = []
 			auxiliary_bf_no_bv = []
-			# sys.exit(1)
 			for (csv_file_bv, csv_file_no_bv) in zip(phy_stat_bv_csv_files, phy_stat_no_bv_csv_files):
 				print(f"Reading file {csv_file_bv}\n")
 				print(f"Reading file {csv_file_no_bv}\n")
@@ -940,9 +825,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = stat_name
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -952,7 +834,6 @@ class StatsPlotter:
 		#BV
 		print('--------------BV------------------')
 		print(f"--------------- PHY: {physical_layer} -----------------------")
-		# sys.exit(1)
 		physical_layer_dict_bv = dict(sorted(csv_files_dict_bv[physical_layer].items()))
 		physical_layer_dict_no_bv = dict(sorted(csv_files_dict_no_bv[physical_layer].items()))
 		for (temperature_bv, csv_files_bv), (temperature_no_bv, csv_files_no_bv) in zip(physical_layer_dict_bv.items(), physical_layer_dict_no_bv.items()):
@@ -1034,6 +915,7 @@ if __name__ == '__main__':
 	else:
 		pair_wise = False
 
+	#Uncomment the function calls to plot the desired graphs
 
 	#Plot beating vs PRR/PDR for all physical layers
 	# stat_plotter.plot_beating_vs_prr_pdr_all_phys('Neg8dBm', bv, 'PDR', pair_wise, 122, 126, 124)

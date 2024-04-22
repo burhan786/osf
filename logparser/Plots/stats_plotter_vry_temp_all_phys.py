@@ -91,7 +91,6 @@ class StatsPlotter:
 		plot_title = f'{stat_name} vs Temperature'
 
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -169,9 +168,6 @@ class StatsPlotter:
 		csv_files_dict_bv = reader.get_dcube_csv_files_pair_temperature(True, str(src), str(fwd), str(dst))
 		reader_2 = FileReader(path)
 		csv_files_dict_no_bv = reader_2.get_dcube_csv_files_pair_temperature(False, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict_bv)
-		# self.print_dictionary(csv_files_dict_no_bv)
-		# sys.exit(1)
 		stat_name_t = None
 		if stat_name == 'PER':
 			stat_name = 'PRR'
@@ -186,9 +182,7 @@ class StatsPlotter:
 			auxiliary_bf_bv = []
 			auxiliary_stat_no_bv = []
 			auxiliary_bf_no_bv = []
-			# print(phy_stat_csv_files[temperature])
 			print(f"--------------- Temperature: {temperature} -----------------------")
-			# sys.exit(1)
 			for (csv_file_bv, csv_file_no_bv) in zip(phy_stat_bv_csv_files[temperature], phy_stat_no_bv_csv_files[temperature]):
 				print(f"Reading file {csv_file_bv}\n")
 				print(f"Reading file {csv_file_no_bv}\n")
@@ -267,7 +261,6 @@ class StatsPlotter:
 		}}
 
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():
@@ -324,7 +317,6 @@ class StatsPlotter:
 
 		reader = FileReader(path)
 		csv_files_dict = reader.get_dcube_csv_files_pair_temperature(bv_mode, str(src), str(fwd), str(dst))
-		# self.print_dictionary(csv_files_dict)
 		plotter = DataPlotter(path, 'PHY_BLE_2M', 64, False)
 
 		for phy, phy_stat_temp_csv_files in csv_files_dict.items():

@@ -18,6 +18,7 @@ class FFTCalculator:
     def get_sorted_error_frequencies(self, error_positions) -> None:
         """
         This function sorts the error positions in ascending order
+        :param error_positions: error positions along with the error count for that position
         :return: None
         """
 
@@ -52,7 +53,6 @@ class FFTCalculator:
             df.to_csv(file_path, index=False)
         else:
             df = pd.DataFrame({'Beating_Frequency': [beating_frequency]})
-            # df['Beating_Frequency'] = beating_frequency
             print(df)
             df.to_csv(file_path, index=False)
 
@@ -61,6 +61,7 @@ class FFTCalculator:
     def fft_calculator(self, err_freq, temperature=None) -> None:
         """
         This function calculates the FFT of the error positions
+        :param err_freq: error positions along with the error count for that position
         :return: None
         """
 
@@ -92,20 +93,14 @@ class FFTCalculator:
             
             power = np.abs(err_fft)
             sample_freq = fftpack.fftfreq(len(self.bit_err_freq), d=(1/sampling_rate)) 
-            # fft_result = np.fft.fft(self.bit_err_freq)
-            # frequencies = np.fft.fftfreq(len(self.bit_err_freq), d=1/sampling_rate)
-
-            # Find index of maximum amplitude (excluding DC component)
-            # max_amp_index = np.argmax(np.abs(fft_result[1:])) + 1
-            # beating_frequency = np.abs(frequencies[max_amp_index])
 
             all_peaks, _ = ssig.find_peaks(power)
             peaks_df = pd.DataFrame({'Power': (power[x] for x in all_peaks), 'Freq': (sample_freq[x] for x in all_peaks)})
             peaks_df = peaks_df.sort_values(by=['Power'], ascending=False)
-            # print(peaks_df)
+ 
             peaks_df = peaks_df[peaks_df.Freq >= 0]
             peak_freq = peaks_df['Freq'].head(6)
-            # print(peak_freq)
+ 
             if peak_freq.any():
                 beating_frequency = int(peak_freq.iloc[0])
                 print("Beating Frequency: ", beating_frequency)
